@@ -1,54 +1,131 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Animated Plot</title>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<title>Birthday Animation</title>
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+#scene {
+  text-align: center;
+}
+
+.cake {
+  width: 200px;
+  height: 120px;
+  background: pink;
+  border-radius: 20px;
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.candle {
+  position: absolute;
+  width: 40px;
+  height: 60px;
+  background: white;
+  top: -60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 24px;
+  border-radius: 6px;
+}
+
+#candle2 { left: 40px; }
+#candle4 { right: 40px; }
+
+.flame {
+  position: absolute;
+  top: -15px;
+  width: 10px;
+  height: 15px;
+  background: orange;
+  border-radius: 50%;
+  animation: flicker 0.2s infinite alternate;
+}
+
+@keyframes flicker {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(1.2); opacity: 0.7; }
+}
+
+.wind {
+  position: absolute;
+  width: 100px;
+  height: 20px;
+  border-top: 2px dashed white;
+  top: 40px;
+  left: -120px;
+  opacity: 0;
+}
+
+.stitch {
+  width: 180px;
+  display: none;
+  margin: 0 auto;
+  animation: blink 2s infinite;
+}    
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+.text {
+  font-size: 40px;
+  margin-top: 20px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+</style>
 </head>
 <body>
-<h2>y = x^(2/3) + 0.9 sqrt(3.5 - x^2) sin(pi a x)</h2>
-<div id="plot" style="width:100%;height:90vh;"></div>
+<div id="scene">
+  <div class="cake" id="cake">
+    <div class="candle" id="candle2">2<div class="flame" id="flame2"></div></div>
+    <div class="candle" id="candle4">4<div class="flame" id="flame4"></div></div>
+  </div>
+
+  <div class="wind" id="wind"></div>
+
+  <img id="stitch" src="stitch_transparent.png" />
+  <div class="text" id="text">Happy Birthday!</div>
+</div>
 
 <script>
-const x = [];
-for (let i = -2; i <= 2; i += 0.01) {
-    x.push(i);
-}
+setTimeout(() => {
+  document.getElementById('wind').style.opacity = 1;
+  document.getElementById('wind').style.left = '220px';
 
-function computeY(a) {
-    return x.map(v => {
-        if (3.5 - v*v < 0) return null;
-        return Math.pow(Math.abs(v), 2/3) 
-             + 0.9*Math.sqrt(3.5 - v*v)*Math.sin(Math.PI*a*v);
-    });
-}
+  // blow candles
+  document.getElementById('flame2').style.display = 'none';
+  document.getElementById('flame4').style.display = 'none';
 
-let frames = [];
-for (let a = 0; a <= 30; a += 0.5) {
-    frames.push({
-        name: a.toFixed(1),
-        data: [{x: x, y: computeY(a)}]
-    });
-}
+  // crumble cake
+  const cake = document.getElementById('cake');
+  cake.style.transition = 'transform 1s, opacity 1s';
+  cake.style.transform = 'scale(0.5) rotate(10deg)';
+  cake.style.opacity = 0;
 
-let layout = {
-    xaxis: {range: [-2, 2]},
-    yaxis: {range: [-2, 3]},
-    title: "<3"
-};
+}, 3000);
 
-Plotly.newPlot('plot', [{
-    x: x,
-    y: computeY(0),
-    mode: 'lines'
-}], layout).then(function() {
-    Plotly.addFrames('plot', frames);
-    Plotly.animate('plot', frames, {
-        frame: {duration: 100, redraw: true},
-        transition: {duration: 0},
-        loop: true
-    });
-});
+setTimeout(() => {
+  document.getElementById('stitch').style.display = 'block';
+}, 4500);
+
+setTimeout(() => {
+  document.getElementById('text').style.opacity = 1;
+}, 6000);
 </script>
 </body>
 </html>
