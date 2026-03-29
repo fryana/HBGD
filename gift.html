@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Animated Plot</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<h2>y = x^(2/3) + 0.9 sqrt(3.5 - x^2) sin(pi a x)</h2>
+<div id="plot" style="width:100%;height:90vh;"></div>
+
+<script>
+const x = [];
+for (let i = -2; i <= 2; i += 0.01) {
+    x.push(i);
+}
+
+function computeY(a) {
+    return x.map(v => {
+        if (3.5 - v*v < 0) return null;
+        return Math.pow(Math.abs(v), 2/3) 
+             + 0.9*Math.sqrt(3.5 - v*v)*Math.sin(Math.PI*a*v);
+    });
+}
+
+let frames = [];
+for (let a = 0; a <= 30; a += 0.5) {
+    frames.push({
+        name: a.toFixed(1),
+        data: [{x: x, y: computeY(a)}]
+    });
+}
+
+let layout = {
+    xaxis: {range: [-2, 2]},
+    yaxis: {range: [-2, 3]},
+    title: "Animation as a varies from 0 to 30"
+};
+
+Plotly.newPlot('plot', [{
+    x: x,
+    y: computeY(0),
+    mode: 'lines'
+}], layout).then(function() {
+    Plotly.addFrames('plot', frames);
+    Plotly.animate('plot', frames, {
+        frame: {duration: 100, redraw: true},
+        transition: {duration: 0},
+        loop: true
+    });
+});
+</script>
+</body>
+</html>
